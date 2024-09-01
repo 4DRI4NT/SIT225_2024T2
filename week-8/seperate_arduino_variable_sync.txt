@@ -1,0 +1,66 @@
+import sys
+import traceback
+import random
+from arduino_iot_cloud import ArduinoCloudClient
+import asyncio
+import datetime
+import csv
+from csv import writer
+
+DEVICE_ID = "bdda2196-1343-4b28-8206-275d538294cd"
+SECRET_KEY = "wRiTRVEIXjE9jb@XbDPy29k2w"
+
+
+def on_x_value_changed(client, value):
+    date = datetime.datetime.now()
+    formatDate = str(date.year) + str(date.month) + str(date.day) + str(date.hour) + str(date.minute) + str(date.second)
+    print(f"{formatDate}, {value}")
+    with open('x_data.csv', 'a', newline='') as x_csv:
+        x_writer = writer(x_csv)
+        x_writer.writerow([formatDate, value])
+
+def on_y_value_changed(client, value):
+    date = datetime.datetime.now()
+    formatDate = str(date.year) + str(date.month) + str(date.day) + str(date.hour) + str(date.minute) + str(date.second)
+    print(f"{formatDate}, {value}")
+    with open('y_data.csv', 'a', newline='') as y_csv:
+        y_writer = writer(y_csv)
+        y_writer.writerow([formatDate, value])
+
+def on_z_value_changed(client, value):
+    date = datetime.datetime.now()
+    formatDate = str(date.year) + str(date.month) + str(date.day) + str(date.hour) + str(date.minute) + str(date.second)
+    print(f"{formatDate}, {value}")
+    with open('z_data.csv', 'a', newline='') as z_csv:
+        z_writer = writer(z_csv)
+        z_writer.writerow([formatDate, value])
+
+
+def main():
+    # Instantiate Arduino cloud client
+    client = ArduinoCloudClient(
+        device_id=DEVICE_ID, username=DEVICE_ID, password=SECRET_KEY
+    )
+
+    client.register(
+        "x_value", value=None, 
+        on_write=on_x_value_changed)
+
+    client.register(
+        "y_value", value=None, 
+        on_write=on_y_value_changed)
+
+    client.register(
+        "z_value", value=None, 
+        on_write=on_z_value_changed)
+
+    # start cloud client
+    client.start()
+
+
+if __name__ == "__main__":
+    try:
+        main()  # main function which runs in an internal infinite loop
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_tb(exc_type, file=print)
